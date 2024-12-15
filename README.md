@@ -51,7 +51,15 @@ yarn build
 - презентер. Код презентера не будет выделен в отдельный класс, так как приложение состоит только из одной страницы - каталога товаров. Презентер содержится в основном скрипте index.ts
 
 ---
-
+### class EventEmitter
+Имплементирует интерфейс 
+```
+export interface IEvents {
+    on<T extends object>(event: EventName, callback: (data: T) => void): void;
+    emit<T extends object>(event: string, data?: T): void;
+    trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void;
+}
+```
 Реализует паттерн «Наблюдатель» и позволяет подписываться на события и уведомлять подписчиков
 о наступлении события.
 * `on` — для подписки на событие  
@@ -178,12 +186,3 @@ export interface IContacts {
 
 ---
 
-### class EventEmitter
-Имплементирует интерфейс 
-```
-export interface IEvents {
-    on<T extends object>(event: EventName, callback: (data: T) => void): void;
-    emit<T extends object>(event: string, data?: T): void;
-    trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void;
-}
-```
