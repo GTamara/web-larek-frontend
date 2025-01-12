@@ -4,10 +4,15 @@ export interface IProduct {
 	image: string;
 	title: string;
 	category: TCategory;
-	price: number;
+	price: number | null;
 }
 
-export type TPayment = 'online' | 'offline' | undefined;
+export interface IProductView extends IProduct {
+	actionTitle: string;
+	quantity: number;
+}
+
+export type TPayment = 'card' | 'cash' | undefined;
 export type TCategory = 'хард-скил' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'другое';
 
 export interface IBasket {
@@ -21,7 +26,9 @@ export interface IContacts {
 	address: string;
 }
 
-export interface IOrder extends IContacts {
+type t = IContacts[keyof IContacts];
+
+export type IOrder = IContacts & {
  	total: number;
 	items: string[];
 }
@@ -35,18 +42,11 @@ export interface IErrorResponce {
 	error: string;
 }
 
-export type TSetNewOrderResponce = ISetNewOrderSuccessResponse | IErrorResponce;
-
-export interface IProductListResponse {
+export interface IProductsListResponse {
 	total: number;
 	items: IProduct[];
 }
 
-export enum EOrderProcessingModals {
-	product = 'modal:product',
-	basket = 'modal:basket',
-	paymentMethod = 'modal:paymentMethod',
-	contacts = 'modal:contacts',
-	success = 'modal:success',
-	none = 'modal:none',
+export interface IActions {
+    onClick: (event: MouseEvent) => void;
 }

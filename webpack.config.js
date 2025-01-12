@@ -76,7 +76,7 @@ const config = {
     extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
   },
   optimization: {
-    minimize: true,
+    // minimize: true,
     minimizer: [new TerserPlugin({
       terserOptions: {
         keep_classnames: true,

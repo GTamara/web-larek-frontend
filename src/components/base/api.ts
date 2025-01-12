@@ -19,24 +19,24 @@ export class Api {
         };
     }
 
-    protected handleResponse(response: Response): Promise<object> {
+    protected handleResponse<T>(response: Response): Promise<T> {
         if (response.ok) return response.json();
         else return response.json()
             .then(data => Promise.reject(data.error ?? response.statusText));
     }
 
-    get(uri: string) {
+    get<T>(uri: string) {
         return fetch(this.baseUrl + uri, {
             ...this.options,
-            method: 'GET'
-        }).then(this.handleResponse);
+            method: 'GET' as ApiPostMethods,
+        }).then((response) => this.handleResponse<T>(response));
     }
 
-    post(uri: string, data: object, method: ApiPostMethods = 'POST') {
+    post<D, T>(uri: string, data: D) {
         return fetch(this.baseUrl + uri, {
             ...this.options,
-            method,
+            method: 'POST' as ApiPostMethods,
             body: JSON.stringify(data)
-        }).then(this.handleResponse);
+        }).then((response) =>this.handleResponse<T>(response));
     }
 }

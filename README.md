@@ -85,11 +85,11 @@ export interface IEvents {
 
 ## Модели данных
 
-### class BucketModel 
-Имплементирует интерфейс `IBucketModel`
+### class BasketModel 
+Имплементирует интерфейс `IBasketModel`
 
 ```
-interface IBucketModel {
+interface IBasketModel {
 	items: Record<Product, quantity>;
 	addItem (id: string): void;
 	removeItem (id: string): void;
@@ -103,7 +103,7 @@ interface IBucketModel {
 
 * addItem (id: string): void - добавление товара в корзину
 * removeItem (id: string): void - удаление товара из корзины
-* resetBucket () - очистить корзину после того, как заказ был усмешно создан
+* resetBasket () - очистить корзину после того, как заказ был усмешно создан
 * calculateTotal (items: Record<Product, quantity>): number - вычислить стоимость товаров в корзине
 ---
 

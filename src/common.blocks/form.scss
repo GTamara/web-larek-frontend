@@ -25,7 +25,8 @@
       outline-style: solid;
     }
 
-    &:invalid {
+    &:invalid,
+	&.error {
       border-color: $error;
       outline-color: $error;
     }
@@ -33,5 +34,9 @@
     &::placeholder {
       color: lighten($primaryLight, 23%);
     }
+  }
+
+  &__errors {
+	color: $error;
   }
 }
