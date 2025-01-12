@@ -212,9 +212,7 @@ eventEmitter.on(/^contacts\..*:change/, (data: { field: keyof IOrderForm, value:
 
 eventEmitter.on('contacts:submit', () => {
 	const userData: IContacts = contactsState.getAllUserData();
-	const orderData: string[] = Array.from(
-		basketState.cardItems.keys()
-	);
+	const orderData: string[] = basketState.getCardItemsIds();
 	const orderPayload = {
 		...userData,
 		items: orderData,

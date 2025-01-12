@@ -55,6 +55,16 @@ export class BasketModel extends Model<Map<string, number>> implements IBasketMo
 		return total;
     }
 
+	getCardItemsIds () {debugger
+		const result: string[] = [];
+		for (let [id, count] of this._cardItems) {
+			result.push(
+				...Array(count).fill(id),
+			);
+		}
+		return result;
+	}
+
 	setSelectedItem (item: IProduct) {
 		this.selectedItem = item;
         this.emitChanges('card:open', { id: item.id });
