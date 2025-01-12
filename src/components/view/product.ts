@@ -53,7 +53,7 @@ export class ProductView extends Component<IProductView> {
         this.setImage(this._image, value, this.title)
     }
 
-    set description(value: string | string[]) {
+    set description (value: string | string[]) {
         if (Array.isArray(value)) {
             this._description.replaceWith(...value.map(str => {
                 const descTemplate = this._description.cloneNode() as HTMLElement;
@@ -65,11 +65,11 @@ export class ProductView extends Component<IProductView> {
         }
     }
 
-	set price(value: number | null) {
+	set price (value: number | null) {
 		this.setText(this._price, value ? `${value} синапсов` : 'Бесценно');
 	}
 
-	set category(value: string) {
+	set category (value: string) {
 		this.setText(this._category, value);
 		let category: string;
 

@@ -77,9 +77,9 @@ export interface IEvents {
 Наследует базовый класс `Api`
 Класс предназначен для взаимодействия с сервером
 
-* getProductList (): IProductListResponse 
-* getProductItem (id: string): IProduct
-* placeNewOrder (order: IOrder): TSetNewOrderResponce
+* getProductList (): Promise<IProduct[]>
+* getProductItem (id: string): Promise<IProduct>
+* placeNewOrder (order: IOrder): Promise<ISetNewOrderSuccessResponse>
 
 ---
 
@@ -89,22 +89,22 @@ export interface IEvents {
 Имплементирует интерфейс `IBasketModel`
 
 ```
-interface IBasketModel {
-	items: Record<Product, quantity>;
+export interface IBasketModel {
+	cardItems: Map<string, number>;
 	addItem (id: string): void;
 	removeItem (id: string): void;
 	clearCard (): void;
-	calculateTotal (items: Record<Product, quantity>): number 
+	getTotal (items: Map<IProduct, number>): number;
 }
 ```
 
 Класс предназначен для управления списком покупок. 
-Список покупок будет храниться в `items: Map<IProduct, number>`. items инициализируется пустым массивом.
+Список покупок будет храниться в `cardItems`.
 
 * addItem (id: string): void - добавление товара в корзину
 * removeItem (id: string): void - удаление товара из корзины
-* resetBasket () - очистить корзину после того, как заказ был усмешно создан
-* calculateTotal (items: Record<Product, quantity>): number - вычислить стоимость товаров в корзине
+* clearCard (): void - очистить корзину после того, как заказ был усмешно создан;
+* getTotal (items: Map<IProduct, number>): number; - вычислить стоимость товаров в корзине
 ---
 
 ### class ContactsModel
@@ -117,12 +117,25 @@ export interface IContacts {
 	address: string;
 }
 ```
-Класс предназначен для управления данными покупателя. При инициализации класса поля принимают значение `undefined`
+Класс предназначен для управления данными покупателя. При инициализации класса поля принимают значение 
+```
+{
+	email: '',
+	phone: '',
+	address: '',
+	payment: 'cash',	
+}
+ ```
+* set email - записать почту пользователя
+* set phone - записать телефон пользователя
+* set address - записать адрес пользователя
+* set / get payment - записать / прочитать способ оплаты пользователя
 
-* set / get email - записать / прочитать почту пользователя
-* set / get phone - записать / прочитать телефон пользователя
-* set / get address - записать / прочитать адрес пользователя
-* set / get paymentMethod - записать / прочитать способ оплаты пользователя
+* getAllUserData (): IContacts - получить текущие данные покупателя
+* clearAllUserData(): void - очистить данные покупателя
+* saveField () - вспомогательная функция для сохранения полей данных покупателя
+* validateOrder() - валидация полей и всей формы #order
+* validateContacts() - валидация полей и всей формы #contacts
 ---
 
 ## Представление
@@ -133,56 +146,66 @@ export interface IContacts {
 
 * render(data?: Partial<T>): HTMLElement - возвращает готовый элемент для последующего помешения его в DOM дерево
 * toggleClass(element: HTMLElement, className: string, force?: boolean): void - для добавления / удаления класса по условию force
+* setText(element: HTMLElement, value: unknown): void - записать текст в элемент
+* setDisabled(element: HTMLElement, state: boolean): void - заблокировать / разблокировать элемент 
+по условию `state`
+* setHidden(element: HTMLElement) - скрыть элемент
+* setVisible(element: HTMLElement) - показать элемент
+* setImage(element: HTMLImageElement, src: string, alt?: string) - установить атрибуты изображения
 ---
 
-### class BasketView
-Отображение содержимого корзины. Наследует класс Component
-* itemsContainer: HTMLElement - контейнер для отображения списка товаров в корзине
-* totalElement: HTMLElement - элемент, в котором выводится общая стоимость товаров корзины
-* constructor (container: HTMLElement) {} - container - контейнер для всей корзины
-* set itemsList (items: IProduct[]) - отрисовывает список покупок в корзине
-* set total (value: number) - отрисовывает список покупок в корзине
+### class Basket extends Component<IBasketView> 
+Класс отвечает за отображение содержимого корзины. Наследует класс Component
+* constructor(container: HTMLElement, protected eventEmitter: EventEmitter) - container - HTML элемент, содержащий корзину
+* set items(items: HTMLElement[]) - отрисовывает покупки в корзине
+* set actionDisabled(total: number) - блокирует / разблокирует кнопку по условию
+* set total(sum: number) - записывает в элемент корзины сумму покупки
 
-### class ProductView
+### class ProductView extends Component<IProductView>
 Отображение одного товара в каталоге. Наследует класс Component
-* init (): void - создает элемент карточки товара и вешает обработчик клика по карточке.
-* set title(value: string): void
-* set category(value: string): void
-* set price(value: string): void
-* set description(value: string): void
+* constructor(protected container: HTMLElement, actions?: IActions) - создает элемент карточки товара и вешает обработчик клика по карточке.
+* get / set id(value: string): void
+* get / set title(value: string): void
+* set category (value: string)
+* set price (value: number | null)
+* set description (value: string | string[])
 * set image(value: string): void
+* actionTitle (value: string) устанавливает title кнопки
+* quantity (value: number) устанавливает количество штук покупки
 
-### class PageView
+### class PageView extends Component<IPage>
 Отображение каталога товаров. Наследует класс Component
-* set items (items: IProduct[]): void - создает каталог с карточками товаров.
+* set catalog (items: HTMLElement[]) - отвечает за отрисовку каталога с карточками товаров.
+* set counter(value: number) - на иконке корзины устанавливает количество позиций в корзинею
+* set locked(value: boolean) - блокирует / разблокирует прокрутки всей страницы по условию.
 
-### class Modal
+
+### class Modal extends Component<IModalData>
 Отображение модального окна. Наследует класс Component
-* init (): void - создает модальное окно, добавляет обработчики клика по кнпке закрытия попапа и по оверлею
-* set content (data: C): void - заполняет смысловую часть попапа.
-* set header (data: H): void - записывает значение в заголовок попапа. Проброс данных во вложенные отображения
-* onOpenHandler() - обработчик, который сработает в момент открытия попапа. В частности, нужен, чтобы добавить обработчики событий клавиатуры
-* onCloseHandler(event?: MouseEvent) - сработает в момент закрытия попапа. В частности, нужен, чтобы удалить обработчики событий клавиатуры
-* set isActive(state: boolean) - Открытие и закрытие модального окна
+* constructor(container: HTMLElement, protected events: IEvents) - создает модальное окно, добавляет обработчики клика по кнпке закрытия попапа и по оверлею
+* set content(value: HTMLElement) - заполняет смысловую часть попапа.
+* open() - обработчик, который сработает в момент открытия попапа. В частности, нужен, чтобы добавить обработчики событий клавиатуры
+* close() - сработает в момент закрытия попапа. В частности, нужен, чтобы удалить обработчики событий клавиатуры
+* render(data: IModalData): HTMLElement - открывает попап с новым содержимым
 
-### class UserDataView
+### class OrderView extends Form<IOrderForm>
 Отображение формы с адресом и способом оплаты пользователя в модальном окне.
-* init () создает форму на основе шаблона в верстке и вешает на форму обработчик события submit 
-* set paymentMethod (value: string): void записывает способ оплаты, выбранный пользователем
+* constructor(container: HTMLFormElement, protected eventEmitter: IEvents) инициализирует форму на основе шаблона в верстке
+* set payment (value: string): void записывает способ оплаты, выбранный пользователем
 * set address (value: string): void записывает адрес, введенный пользователем пользователем
-* onSubmitHandler(event: SubmitEvent) обработчик события submit
+* render(data: any): HTMLFormElement возвращает форму
 
-### class ContactsView
+### class ContactsView extends Form<IContactsForm>
 Отображение формы с телефоном и адресом электронной почты пользователя в модальном окне.
-* init () создает форму на основе шаблона в верстке и вешает на форму обработчик события submit 
-* set paymentMethod (value: string): void записывает способ оплаты, выбранный пользователем
-* set address (value: string): void записывает адрес, введенный пользователем пользователем
-* onSubmitHandler(event: SubmitEvent) обработчик события submit
+* constructor(container: HTMLFormElement, protected events: IEvents) создает форму на основе шаблона в верстке
+* set phone (value: string) записывает телефон пользователя
+* set email (value: string) записывает email пользователя
+* render(data: any): HTMLFormElement возвращает форму
 
 ### class SuccessPopup
 Отображение попапа с результатом успешно оформленного заказа.
-* init () создает форму на основе шаблона в верстке
-* set total (value: string): void записывает сумму, списанную за оформленный заказ
+* constructor(container: HTMLFormElement, eventEmitter: IEvents) инициализирует содержимое компонента Success
+* set total (value: number): void записывает сумму, списанную за оформленный заказ
 
 ---
 

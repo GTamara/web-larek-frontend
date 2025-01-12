@@ -40,6 +40,11 @@ export class OrderView extends Form<IOrderForm> {
         });
     }
 
+	set address (value: string) {
+		(this.container.elements.namedItem('address') as HTMLInputElement).value = value || '';
+	}
+
+
 	render(data: any): HTMLFormElement {
 		super.render(data);
 		return this.container;
