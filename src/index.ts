@@ -38,7 +38,7 @@ const basket = new Basket(cloneTemplate(basketTemplate), eventEmitter);
 
 // Модель данных приложения
 const contactsState = new ContactsModel({} as IContacts, eventEmitter);
-const basketState = new BasketModel(null, eventEmitter);
+const basketState = new BasketModel(new Map(), eventEmitter);
 
 // Views
 const orderView = new OrderView(cloneTemplate(orderTemplate), eventEmitter);
@@ -103,7 +103,7 @@ eventEmitter.on('card:open', (item: IProduct) => {
 					image: CDN_URL + itemData.image,
 					description: itemData.description,
 					category: itemData.category,
-					price: (productQuantity ? itemData.price * productQuantity : itemData.price),
+					price: (productQuantity ? (itemData.price ?? 0) * productQuantity : itemData.price),
 					actionTitle: getActionTitle(item.id),
 				}),
 			});
@@ -141,7 +141,7 @@ function getBasketContent (basketState: BasketModel): HTMLElement {
 		total: basketState.getTotal(),
 		actionDisabled: basketState.getTotal(),
 		items: Array.from(basketState.cardItems.entries())
-			.map(item => {
+			.map((item, index) => {
 				const itemData = basketState.catalog.find(it => it.id === item[0]);
 
 				const card = new ProductView(
@@ -157,6 +157,7 @@ function getBasketContent (basketState: BasketModel): HTMLElement {
 					id: item[0],
 					quantity: item[1],
 					...itemData,
+					index: index + 1,
 				});
 			}),
 	});
@@ -222,6 +223,8 @@ eventEmitter.on('contacts:submit', () => {
 	larekApi
 		.placeNewOrder(orderPayload)
 		.then((response: ISetNewOrderSuccessResponse) => {
+			contactsState.clearAllUserData();
+			basketState.clearCard();
 			const successView = new SuccessView(cloneTemplate(successTemplate), eventEmitter);
 			modal.render({
 				content: successView.render({
@@ -230,7 +233,6 @@ eventEmitter.on('contacts:submit', () => {
 			});
 		})
 		.catch((err) => {
-			const r = typeof(err)
 			console.error(`Не удалось оформить заказ. Попробуйте позднее. Error: ${err}`)
 		});
 	

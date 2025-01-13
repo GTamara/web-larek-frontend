@@ -8,7 +8,6 @@ export interface ISuccessView {
 
 export class SuccessView extends Component<ISuccessView> {
 	protected _closeButton: HTMLButtonElement;
-	protected _content: HTMLElement;
 	protected _total: HTMLElement;
 
 	constructor(container: HTMLFormElement, eventEmitter: IEvents) {

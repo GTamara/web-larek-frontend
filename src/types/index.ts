@@ -10,14 +10,16 @@ export interface IProduct {
 export interface IProductView extends IProduct {
 	actionTitle: string;
 	quantity: number;
+	index: number
 }
 
-export type TPayment = 'card' | 'cash' | undefined;
 export type TCategory = 'хард-скил' | 'софт-скил' | 'дополнительное' | 'кнопка' | 'другое';
 
 export interface IBasket {
 	items: Map<string, number>
 }
+
+export type TPayment = 'card' | 'cash' | undefined;
 
 export interface IContacts {
 	payment: TPayment;
@@ -25,8 +27,6 @@ export interface IContacts {
 	phone: string;
 	address: string;
 }
-
-type t = IContacts[keyof IContacts];
 
 export type IOrder = IContacts & {
  	total: number;

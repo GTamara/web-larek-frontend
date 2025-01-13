@@ -9,7 +9,6 @@ export interface IContactsForm {
 
 export class ContactsView extends Form<IContactsForm> {
 	protected _submitButton: HTMLButtonElement;
-	protected _content: HTMLElement;
 
 	constructor(container: HTMLFormElement, protected events: IEvents) {
 		super(container, events);

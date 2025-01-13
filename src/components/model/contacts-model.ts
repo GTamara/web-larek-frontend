@@ -25,7 +25,7 @@ export class ContactsModel extends Model<IContacts> implements IContactsModel {
 		this._data.phone = phone;
 	}
 
-	set address (address: string) {
+	set address (address: string) {debugger
 		this._data.address = address;
 	}
 
@@ -42,7 +42,12 @@ export class ContactsModel extends Model<IContacts> implements IContactsModel {
 	}
 
 	clearAllUserData(): void {
-		this._data = null;
+		this._data = {
+			email: '',
+			phone: '',
+			address: '',
+			payment: 'cash',	
+		};
 	}
 
 	saveField(field: keyof IContacts, value: string & TPayment) {

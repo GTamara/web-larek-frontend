@@ -11,10 +11,10 @@ export interface IBasketModel {
 
 export class BasketModel extends Model<Map<string, number>> implements IBasketModel {
 
-	private _cardItems: Map<string, number> | null = new Map();
+	private _cardItems: Map<string, number> = new Map();
 
 	selectedItem: IProduct | null = null;
-	catalog: IProduct[];
+	catalog: IProduct[] = [];
 
 	get cardItems () {
 		return this._cardItems;
@@ -26,7 +26,7 @@ export class BasketModel extends Model<Map<string, number>> implements IBasketMo
 
 	addItem (id: string) {
 		if (this.cardItems.has(id)) {
-			this.cardItems.set(id, this.cardItems.get(id) + 1);
+			this.cardItems.set(id, (this.cardItems.get(id) ?? 0) + 1);
 		} else {
 			this.cardItems.set(id, 1);
 		}
@@ -40,9 +40,8 @@ export class BasketModel extends Model<Map<string, number>> implements IBasketMo
 		}
 	}
 
-	clearCard () {
+	clearCard () {debugger
 		this._cardItems.clear();
-		this._cardItems = null;
 		this.emitChanges('basket:items-сhanged', this._cardItems);
 	}
 
@@ -50,12 +49,12 @@ export class BasketModel extends Model<Map<string, number>> implements IBasketMo
 		let total = 0;
 		for (let [id, count] of this._cardItems) {
 			const itemData = this.catalog.find(it => it.id === id);
-			total += itemData.price * count;
+			total += (itemData?.price ?? 0) * count;
 		}
 		return total;
     }
 
-	getCardItemsIds () {debugger
+	getCardItemsIds () {
 		const result: string[] = [];
 		for (let [id, count] of this._cardItems) {
 			result.push(

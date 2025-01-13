@@ -3,14 +3,23 @@ import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/component";
 
 export class ProductView extends Component<IProductView> {
-    protected _id: string;
+    protected _id: string = '';
     protected _title: HTMLElement;
-    protected _image?: HTMLImageElement;
-    protected _description?: HTMLElement;
-    protected _button?: HTMLButtonElement;
+    protected _image: HTMLImageElement;
+    protected _description: HTMLElement;
+    protected _button: HTMLButtonElement;
     protected _price: HTMLSpanElement;
-    protected _category?: HTMLSpanElement;
-	protected _quantity?: HTMLSpanElement;
+    protected _category: HTMLSpanElement;
+	protected _quantity: HTMLSpanElement;
+	protected _index: HTMLElement;
+
+	protected categoryColors = <Record<string, string>>{ 
+		"софт-скил": 'soft', 
+		"другое": 'other', 
+		"кнопка": 'button', 
+		"хард-скил": 'hard', 
+		"дополнительное": 'additional' 
+	}
 
     constructor(protected container: HTMLElement, actions?: IActions) {
         super(container);
@@ -18,11 +27,12 @@ export class ProductView extends Component<IProductView> {
         this._title = ensureElement<HTMLElement>(`.card__title`, container);
 		this._price = ensureElement<HTMLImageElement>(`.card__price`, container);
 
-        this._image = container.querySelector<HTMLImageElement>(`.card__image`);
-        this._button = container.querySelector<HTMLButtonElement>(`.card__button`);
-        this._description = container.querySelector(`.card__description`);
-        this._category = container.querySelector(`.card__category`);
-		this._quantity = container.querySelector(`.card__quantity`);
+        this._image = container.querySelector<HTMLImageElement>(`.card__image`) as HTMLImageElement;
+        this._button = container.querySelector<HTMLButtonElement>(`.card__button`) as HTMLButtonElement;
+        this._description = container.querySelector(`.card__text`) as HTMLElement;
+        this._category = container.querySelector(`.card__category`) as HTMLSpanElement;
+		this._quantity = container.querySelector(`.card__quantity`) as HTMLSpanElement;
+		this._index = container.querySelector(`.basket__item-index`) as HTMLElement;
 
         if (actions?.onClick) {
             if (this._button) {
@@ -55,8 +65,8 @@ export class ProductView extends Component<IProductView> {
 
     set description (value: string | string[]) {
         if (Array.isArray(value)) {
-            this._description.replaceWith(...value.map(str => {
-                const descTemplate = this._description.cloneNode() as HTMLElement;
+            this._description?.replaceWith(...value.map(str => {
+                const descTemplate = this._description?.cloneNode() as HTMLElement;
                 this.setText(descTemplate, str);
                 return descTemplate;
             }));
@@ -69,30 +79,11 @@ export class ProductView extends Component<IProductView> {
 		this.setText(this._price, value ? `${value} синапсов` : 'Бесценно');
 	}
 
-	set category (value: string) {
-		this.setText(this._category, value);
-		let category: string;
-
-		switch (value) {
-			case 'хард-скилл':
-				category = 'hard';
-				break;
-			case 'софт-скилл':
-				category = 'soft';
-				break;
-			case 'другое':
-				category = 'other';
-				break;
-			case 'кнопка':
-				category = 'button';
-				break;
-			case 'дополнительное':
-				category = 'additional';
-				break;
-			default:
-				category = 'other';
-		}
-		this._category &&this._category.classList.add(`card__category_${category}`);
+	set category(value: string) { 
+		this.setText(this._category, value); 
+		if (this._category) { 
+			this._category.className = `card__category card__category_${this.categoryColors[value]}`; 
+		} 
 	}
 
 	set actionTitle (value: string) {
@@ -103,4 +94,7 @@ export class ProductView extends Component<IProductView> {
 		this.setText(this._quantity, `( ${value} ) шт.`);
 	}
 
+	set index (value: number) {
+		this.setText(this._index, value);
+	}
 }
